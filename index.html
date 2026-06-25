@@ -11,68 +11,209 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #e44f24; /* Arancione Ananke */
             color: #111111;
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
         .serif-ananke {
             font-family: 'Cormorant Garamond', serif;
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- CONTENITORE DELLO SFONDO GEOMETRICO ANIMATO (Stile tumblr_nlu6nmgOV51rrmloyo1_500.gif) --- */
+        .geo-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none; /* Evita che le forme blocchino i clic sui bottoni */
+            overflow: hidden;
+        }
+
+        /* Definizione delle forme geometriche ispirate all'immagine */
+        .geo-shape {
+            position: absolute;
+            opacity: 0.25;
+            transform-origin: center;
+        }
+
+        /* 1. Il grande triangolo grigio chiaro */
+        .shape-triangle {
+            width: 0;
+            height: 0;
+            border-left: 180px solid transparent;
+            border-right: 180px solid transparent;
+            border-bottom: 300px solid #dcdcdc;
+            top: 15%;
+            left: -5%;
+            animation: floatTriangle 25s ease-in-out infinite alternate;
+        }
+
+        /* 2. La linea sottile scura obliqua */
+        .shape-line {
+            width: 2px;
+            height: 500px;
+            background-color: #222222;
+            top: -5%;
+            right: 15%;
+            transform: rotate(40deg);
+            animation: shiftLine 30s ease-in-out infinite alternate;
+        }
+
+        /* 3. Il rettangolo rosa/salmone inclinato */
+        .shape-bar-pink {
+            width: 450px;
+            height: 50px;
+            background-color: #fca5a5;
+            top: 35%;
+            left: 10%;
+            transform: rotate(-25deg);
+            box-shadow: -5px 5px 0px rgba(234, 179, 8, 0.4); /* Effetto doppio strato giallo ocra della gif */
+            animation: floatBar 18s ease-in-out infinite alternate;
+        }
+
+        /* 4. Il cerchio azzurro chiaro */
+        .shape-circle-blue {
+            width: 90px;
+            height: 90px;
+            background-color: #bae6fd;
+            border-radius: 50%;
+            bottom: 25%;
+            right: 8%;
+            animation: floatCircle 14s ease-in-out infinite alternate;
+        }
+
+        /* 5. Il semicerchio / cupola grigia in basso a sinistra */
+        .shape-dome {
+            width: 220px;
+            height: 110px;
+            background-color: #b7b5b3;
+            border-top-left-radius: 110px;
+            border-top-right-radius: 110px;
+            bottom: -20px;
+            left: 8%;
+            animation: swayDome 22s ease-in-out infinite alternate;
+        }
+
+        /* 6. La barretta blu orizzontale della bilancia */
+        .shape-bar-blue {
+            width: 160px;
+            height: 20px;
+            background-color: #6366f1;
+            bottom: 70px;
+            left: 18%;
+            animation: floatBarBlue 12s ease-in-out infinite alternate;
+        }
+
+        /* --- ANIMAZIONI CSS --- */
+        @keyframes floatTriangle {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            50% { transform: translate(30px, -20px) rotate(8deg) scale(1.05); }
+            100% { transform: translate(-15px, 40px) rotate(-5deg) scale(0.95); }
+        }
+
+        @keyframes shiftLine {
+            0% { transform: rotate(40deg) translate(0, 0); }
+            100% { transform: rotate(45deg) translate(-40px, 20px); }
+        }
+
+        @keyframes floatBar {
+            0% { transform: rotate(-25deg) translate(0, 0); }
+            100% { transform: rotate(-21deg) translate(20px, -30px); }
+        }
+
+        @keyframes floatCircle {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-40px, -50px) scale(1.1); }
+        }
+
+        @keyframes swayDome {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(15px, 0) rotate(3deg); }
+        }
+
+        @keyframes floatBarBlue {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(10px, -15px); }
+        }
+
+        /* Assicura che il contenuto principale stia sopra lo sfondo geo */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 max-w-4xl mx-auto">
 
-    <!-- HEADER -->
-    <header class="text-center my-6 border-b border-black/10 pb-6">
-        <h1 class="serif-ananke text-5xl md:text-6xl text-stone-950 tracking-tight font-medium lowercase">ananke</h1>
-        <h2 class="serif-ananke text-2xl md:text-3xl text-stone-900 tracking-wide mt-1 italic">La carta dei vini</h2>
-        <div id="status-loading" class="text-xs text-stone-900/60 mt-3 font-medium">Caricamento cantina in corso...</div>
-    </header>
+    <!-- LIVELLO DELLO SFONDO GEOMETRICO -->
+    <div class="geo-background">
+        <div class="geo-shape shape-triangle"></div>
+        <div class="geo-shape shape-line"></div>
+        <div class="geo-shape shape-bar-pink"></div>
+        <div class="geo-shape shape-circle-blue"></div>
+        <div class="geo-shape shape-dome"></div>
+        <div class="geo-shape shape-bar-blue"></div>
+    </div>
 
-    <!-- STRUMENTI DI FILTRO E RICERCA -->
-    <section class="mb-8 space-y-4">
-        <!-- Barra di Ricerca -->
-        <input type="text" id="search-bar" oninput="renderWines()" placeholder="Cerca per nome, cantina, zona, regione..." class="w-full bg-white/20 placeholder-stone-800/60 p-3 rounded-xl border border-black/10 focus:outline-none focus:border-black/40 focus:bg-white/30 text-stone-950 text-sm transition">
-        
-        <!-- Filtri Categorie e Sottocategorie -->
-        <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-            <button onclick="filterType('Tutti', false)" class="cat-btn px-4 py-2 bg-stone-950 text-white rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap shadow-sm">Tutti</button>
-            
-            <!-- Categorie Principali -->
-            <button onclick="filterType('rosso', false)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition border border-black/5 font-bold">Rossi</button>
-            <button onclick="filterType('bianco', false)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition border border-black/5 font-bold">Bianchi</button>
-            <button onclick="filterType('bollicine', false)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition border border-black/5 font-bold">Bollicine</button>
-            
-            <!-- Sottocategorie -->
-            <button onclick="filterType('rossi snelli', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Rossi snelli</button>
-            <button onclick="filterType('rossi muscolosi', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Rossi muscolosi</button>
-            <button onclick="filterType('bianchi salini', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Bianchi salini</button>
-            <button onclick="filterType('bianchi profumati', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Bianchi profumati</button>
-            <button onclick="filterType('champagne', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Champagne</button>
-        </div>
+    <!-- CONTENITORE CONTENUTO (SOPRA LO SFONDO) -->
+    <div class="content-wrapper">
+        <!-- HEADER -->
+        <header class="text-center my-6 border-b border-black/10 pb-6">
+            <h1 class="serif-ananke text-5xl md:text-6xl text-stone-950 tracking-tight font-medium lowercase">ananke</h1>
+            <h2 class="serif-ananke text-2xl md:text-3xl text-stone-900 tracking-wide mt-1 italic">La carta dei vini</h2>
+            <div id="status-loading" class="text-xs text-stone-900/60 mt-3 font-medium">Caricamento cantina in corso...</div>
+        </header>
 
-        <div class="flex flex-col sm:flex-row gap-3 pt-1 border-t border-black/5">
-            <!-- Filtri Range di Prezzo (ECONOMY / POWER) -->
-            <div class="flex gap-2 flex-1">
-                <button onclick="filterPrice('ECONOMY')" id="btn-economy" class="price-btn flex-1 py-2.5 bg-white/10 text-stone-900/80 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95">
-                    💰 ECONOMY <span class="block text-[9px] font-normal tracking-normal text-stone-800/60">Fino a 35€</span>
-                </button>
-                <button onclick="filterPrice('POWER')" id="btn-power" class="price-btn flex-1 py-2.5 bg-white/10 text-stone-900/80 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95">
-                    ⚡ POWER <span class="block text-[9px] font-normal tracking-normal text-stone-800/60">Sopra i 35€</span>
+        <!-- STRUMENTI DI FILTRO E RICERCA -->
+        <section class="mb-8 space-y-4">
+            <!-- Barra di Ricerca -->
+            <input type="text" id="search-bar" oninput="renderWines()" placeholder="Cerca per nome, cantina, zona, regione..." class="w-full bg-white/20 placeholder-stone-800/60 p-3 rounded-xl border border-black/10 focus:outline-none focus:border-black/40 focus:bg-white/30 text-stone-950 text-sm transition">
+            
+            <!-- Filtri Categorie e Sottocategorie -->
+            <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <button onclick="filterType('Tutti', false)" class="cat-btn px-4 py-2 bg-stone-950 text-white rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap shadow-sm">Tutti</button>
+                
+                <!-- Categorie Principali -->
+                <button onclick="filterType('rosso', false)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition border border-black/5 font-bold">Rossi</button>
+                <button onclick="filterType('bianco', false)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition border border-black/5 font-bold">Bianchi</button>
+                <button onclick="filterType('bollicine', false)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition border border-black/5 font-bold">Bollicine</button>
+                
+                <!-- Sottocategorie -->
+                <button onclick="filterType('rossi snelli', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Rossi snelli</button>
+                <button onclick="filterType('rossi muscolosi', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Rossi muscolosi</button>
+                <button onclick="filterType('bianchi salini', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Bianchi salini</button>
+                <button onclick="filterType('bianchi profumati', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Bianchi profumati</button>
+                <button onclick="filterType('champagne', true)" class="cat-btn px-4 py-2 bg-white/20 text-stone-950 hover:bg-white/30 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap transition">Champagne</button>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-1 border-t border-black/5">
+                <!-- Filtri Range di Prezzo (ECONOMY / POWER) -->
+                <div class="flex gap-2 flex-1">
+                    <button onclick="filterPrice('ECONOMY')" id="btn-economy" class="price-btn flex-1 py-2.5 bg-white/10 text-stone-900/80 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95">
+                        💰 ECONOMY <span class="block text-[9px] font-normal tracking-normal text-stone-800/60">Fino a 35€</span>
+                    </button>
+                    <button onclick="filterPrice('POWER')" id="btn-power" class="price-btn flex-1 py-2.5 bg-white/10 text-stone-900/80 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95">
+                        ⚡ POWER <span class="block text-[9px] font-normal tracking-normal text-stone-800/60">Sopra i 35€</span>
+                    </button>
+                </div>
+                <!-- Tasto "FAI TU" per gli indecisi -->
+                <button onclick="suggestRandomWine()" class="w-full sm:w-auto px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-xs font-black tracking-wider transition active:scale-95 shadow-sm uppercase cursor-pointer">
+                    MA CHE NE SO. FAI TU.
                 </button>
             </div>
-            <!-- Tasto "FAI TU" per gli indecisi -->
-            <button onclick="suggestRandomWine()" class="w-full sm:w-auto px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-xs font-black tracking-wider transition active:scale-95 shadow-sm uppercase">
-                MA CHE NE SO. FAI TU.
-            </button>
-        </div>
-    </section>
+        </section>
 
-    <!-- LISTA DEI VINI -->
-    <main id="wine-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- I vini compariranno qui -->
-    </main>
+        <!-- LISTA DEI VINI -->
+        <main id="wine-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- I vini compariranno qui -->
+        </main>
+    </div>
 
-    <!-- FINESTRA DETTAGLI (MODAL) -->
+    <!-- FINESTRA DETTAGLI (MODAL - FUORI DAL WRAPPER PER EVITARE CONFLITTI DI LIVELLI) -->
     <div id="wine-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 items-center justify-center p-4" onclick="closeModal()">
         <div class="bg-stone-950 text-white p-6 md:p-8 rounded-3xl max-w-lg w-full border border-stone-800 shadow-2xl relative" onclick="event.stopPropagation()">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-white text-2xl font-sans">&times;</button>
@@ -91,7 +232,6 @@
     </div>
 
     <script>
-        // Ricordati di rimettere il tuo URL funzionante qui dentro se lo risasvasti da zero
         const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/17O5LVhc-iiQSwvMl7iWxgENIxnfaUJx1sJrTTyzRYTE/edit?hl=it&gid=0#gid=0";
 
         let wines = [];
@@ -126,7 +266,6 @@
                     return;
                 }
 
-                // Filtra via le righe completamente vuote in partenza per evitare crash
                 const validRows = rows.filter(row => row && row.c && row.c[cols.indexOf('nome')] && row.c[cols.indexOf('nome')].v);
 
                 wines = shuffleWines(validRows.map(row => {
@@ -306,7 +445,7 @@
                             </h3>
                             <p class="text-stone-900/70 text-sm mt-0.5 font-medium">${w.cantina}</p>
                             <p class="text-stone-900/60 text-xs mt-2 flex items-center gap-1 font-medium">📍 ${geoString}</p>
-                            ${hasDesc ? `<span class="text-[10px] font-semibold text-stone-900/50 mt-3 block font-sans">&#x24D8; Nota di degustazione disponibile</span>` : ''}
+                            ${hasDesc ? `<span class="text-[10px] font-semibold text-stone-900/50 mt-3 block font-sans">&#x24D8; Nota di degustazione disposable</span>` : ''}
                         </div>
                     </div>
                 `;
