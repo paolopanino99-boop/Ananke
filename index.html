@@ -17,6 +17,13 @@
         .serif-ananke {
             font-family: 'Cormorant Garamond', serif;
         }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8 max-w-4xl mx-auto">
@@ -31,24 +38,25 @@
     <!-- STRUMENTI DI FILTRO -->
     <section class="mb-8 space-y-4">
         
-        <!-- Filtri Categorie Principali con Menù a tendina per Zone -->
-        <div class="flex flex-wrap items-center gap-2">
-            <button onclick="filterType('Tutti', this)" class="cat-btn px-4 py-2 bg-stone-950 text-white rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap shadow-sm cursor-pointer">Tutti</button>
+        <!-- Filtri Categorie Principali -->
+        <div class="flex overflow-x-auto no-scrollbar items-center gap-1.5 py-1 whitespace-nowrap">
+            <button onclick="filterType('Tutti', this)" class="cat-btn px-3 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm cursor-pointer">Tutti</button>
             
             <!-- Menù a Tendina Rossi -->
-            <select id="select-rossi" onchange="handleSelectZone('rosso', this.value)" class="cat-btn px-3 py-2 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer">
+            <select id="select-rossi" onchange="handleSelectZone('rosso', this.value)" class="cat-btn px-2.5 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer">
                 <option value="">Rossi</option>
-                <!-- Le zone rosse verranno inserite dinamicamente -->
             </select>
 
             <!-- Menù a Tendina Bianchi -->
-            <select id="select-bianchi" onchange="handleSelectZone('bianco', this.value)" class="cat-btn px-3 py-2 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer">
+            <select id="select-bianchi" onchange="handleSelectZone('bianco', this.value)" class="cat-btn px-2.5 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer">
                 <option value="">Bianchi</option>
-                <!-- Le zone bianche verranno inserite dinamicamente -->
             </select>
 
-            <button onclick="filterType('bollicine', this)" class="cat-btn px-4 py-2 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition border border-black/5 cursor-pointer">Bollicine</button>
-            <button onclick="filterType('champagne', this)" class="cat-btn px-4 py-2 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition border border-black/5 cursor-pointer">Champagne</button>
+            <button onclick="filterType('arancione', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Arancione</button>
+            <button onclick="filterType('rosa', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rosa</button>
+            <button onclick="filterType('rifermentato', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rifermentato</button>
+            <button onclick="filterType('bollicine', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Bollicine</button>
+            <button onclick="filterType('champagne', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Champagne</button>
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 pt-1 border-t border-black/5">
@@ -189,8 +197,8 @@
                 }
             });
 
-            rossiSelect.innerHTML = '<option value="">Tutti i Rossi</option>';
-            bianchiSelect.innerHTML = '<option value="">Tutti i Bianchi</option>';
+            rossiSelect.innerHTML = '<option value="">Rossi</option>';
+            bianchiSelect.innerHTML = '<option value="">Bianchi</option>';
 
             Array.from(zoneRossi).sort().forEach(zona => {
                 rossiSelect.innerHTML += `<option value="${zona}">${zona}</option>`;
@@ -225,15 +233,15 @@
 
         function updateButtonStyles(activeType, element) {
             document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = "cat-btn px-4 py-2 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition border border-black/5 focus:outline-none cursor-pointer";
+                btn.className = "cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer";
             });
 
             if (element) {
-                element.className = "cat-btn px-4 py-2 bg-stone-950 text-white rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap shadow-sm focus:outline-none cursor-pointer";
+                element.className = "cat-btn px-3 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm focus:outline-none cursor-pointer";
             } else if (activeType === 'rosso') {
-                document.getElementById('select-rossi').className = "cat-btn px-3 py-2 bg-stone-950 text-white rounded-full text-xs font-bold uppercase tracking-wider transition border border-stone-800 focus:outline-none cursor-pointer";
+                document.getElementById('select-rossi').className = "cat-btn px-2.5 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-stone-800 focus:outline-none cursor-pointer";
             } else if (activeType === 'bianco') {
-                document.getElementById('select-bianchi').className = "cat-btn px-3 py-2 bg-stone-950 text-white rounded-full text-xs font-bold uppercase tracking-wider transition border border-stone-800 focus:outline-none cursor-pointer";
+                document.getElementById('select-bianchi').className = "cat-btn px-2.5 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-stone-800 focus:outline-none cursor-pointer";
             }
         }
 
@@ -307,18 +315,20 @@
 
             const filtered = wines.map((w, index) => ({...w, originalIndex: index})).filter(w => {
                 let matchesFilter = false;
+                const activeFilterLower = currentFilter.toLowerCase().trim();
+                const wineTipoLower = w.tipo ? w.tipo.toLowerCase().trim() : '';
                 
-                if (currentFilter === 'Tutti') { 
+                if (activeFilterLower === 'tutti') { 
                     matchesFilter = true; 
-                } else if (currentFilter.toLowerCase() === 'champagne') {
-                    matchesFilter = w.champagne === true || w.tipo === 'champagne';
+                } else if (activeFilterLower === 'champagne') {
+                    matchesFilter = w.champagne === true || wineTipoLower === 'champagne';
                 } else { 
-                    matchesFilter = w.tipo === currentFilter.toLowerCase(); 
+                    matchesFilter = wineTipoLower === activeFilterLower; 
                 }
                 
                 let matchesZone = true;
                 if (currentZoneFilter !== '') {
-                    matchesZone = w.zona === currentZoneFilter;
+                    matchesZone = w.zona.toLowerCase().trim() === currentZoneFilter.toLowerCase().trim();
                 }
                 
                 let matchesPrice = true;
@@ -337,14 +347,19 @@
                 let badgeLabel = w.tipo || 'Vino';
                 let badgeColor = 'bg-stone-900 text-stone-200';
                 
+                const tipoCheck = w.tipo ? w.tipo.toLowerCase().trim() : '';
+
                 if (w.champagne) { badgeLabel = 'Champagne'; badgeColor = 'bg-yellow-900/60 text-yellow-950 font-bold border border-yellow-900/20'; }
                 else if (w['rossi muscolosi']) { badgeLabel = 'Rosso Muscoloso'; badgeColor = 'bg-red-950 text-red-100'; }
                 else if (w['rossi snelli']) { badgeLabel = 'Rosso Snello'; badgeColor = 'bg-red-900/80 text-red-100'; }
                 else if (w['bianchi profumati']) { badgeLabel = 'Bianco Profumato'; badgeColor = 'bg-amber-950 text-amber-100'; }
                 else if (w['bianchi salini']) { badgeLabel = 'Bianco Salino'; badgeColor = 'bg-yellow-950 text-amber-100'; }
-                else if (w.tipo === 'rosso') { badgeLabel = 'Rosso'; badgeColor = 'bg-red-950 text-red-200'; }
-                else if (w.tipo === 'bianco') { badgeLabel = 'Bianco'; badgeColor = 'bg-amber-950 text-amber-100'; }
-                else if (w.tipo === 'bollicine') { badgeLabel = 'Bollicine'; badgeColor = 'bg-stone-950 text-amber-200'; }
+                else if (tipoCheck === 'rosso') { badgeLabel = 'Rosso'; badgeColor = 'bg-red-950 text-red-200'; }
+                else if (tipoCheck === 'bianco') { badgeLabel = 'Bianco'; badgeColor = 'bg-amber-950 text-amber-100'; }
+                else if (tipoCheck === 'bollicine') { badgeLabel = 'Bollicine'; badgeColor = 'bg-stone-950 text-amber-200'; }
+                else if (tipoCheck === 'arancione') { badgeLabel = 'Arancione'; badgeColor = 'bg-orange-800 text-orange-100'; }
+                else if (tipoCheck === 'rosa') { badgeLabel = 'Rosa'; badgeColor = 'bg-pink-800 text-pink-100'; }
+                else if (tipoCheck === 'rifermentato') { badgeLabel = 'Rifermentato'; badgeColor = 'bg-lime-900 text-lime-100'; }
 
                 const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-black/10 text-stone-900 px-1.5 py-0.5 rounded border border-black/10 ml-2 uppercase">${w.doc}</span>` : '';
                 const geoString = w.zona ? `${w.zona} &bull; ${w.regione}` : w.regione;
