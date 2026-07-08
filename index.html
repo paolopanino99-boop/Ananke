@@ -21,26 +21,21 @@
 </head>
 <body class="p-4 md:p-8 max-w-4xl mx-auto">
 
-    <!-- HEADER -->
     <header class="text-center my-6 border-b border-black/10 pb-6">
         <h1 class="serif-ananke text-5xl md:text-6xl text-stone-950 tracking-tight font-medium lowercase">ananke</h1>
         <h2 class="serif-ananke text-2xl md:text-3xl text-stone-900 tracking-wide mt-1 italic">La carta dei vini</h2>
         <div id="status-loading" class="text-xs text-stone-900/60 mt-3 font-medium">Caricamento cantina in corso...</div>
     </header>
 
-    <!-- STRUMENTI DI FILTRO -->
     <section class="mb-8 space-y-4">
         
-        <!-- Filtri Categorie Principali -->
         <div class="flex flex-wrap items-center gap-1.5 py-1">
             <button onclick="filterType('Tutti', this)" class="cat-btn px-3 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm cursor-pointer">Tutti</button>
             
-            <!-- Menù a Tendina Rossi -->
             <select id="select-rossi" onchange="handleSelectZone('rosso', this.value)" class="cat-btn px-2.5 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer">
                 <option value="">Rossi</option>
             </select>
 
-            <!-- Menù a Tendina Bianchi -->
             <select id="select-bianchi" onchange="handleSelectZone('bianco', this.value)" class="cat-btn px-2.5 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer">
                 <option value="">Bianchi</option>
             </select>
@@ -53,7 +48,6 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 pt-1 border-t border-black/5">
-            <!-- Filtri Range di Prezzo -->
             <div class="flex gap-2 flex-1">
                 <button onclick="filterPrice('ECONOMY')" id="btn-economy" class="price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer">
                     💰 ECONOMY <span class="block text-[9px] font-normal tracking-normal text-stone-950/60">Fino a 35€</span>
@@ -62,19 +56,15 @@
                     ⚡ POWER <span class="block text-[9px] font-normal tracking-normal text-stone-950/60">Sopra i 35€</span>
                 </button>
             </div>
-            <!-- Tasto "FAI TU" -->
             <button onclick="suggestRandomWine()" class="w-full sm:w-auto px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-xs font-black tracking-wider transition active:scale-95 shadow-sm uppercase cursor-pointer">
                 MA CHE NE SO. FAI TU.
             </button>
         </div>
     </section>
 
-    <!-- LISTA DEI VINI -->
     <main id="wine-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- I vini compariranno qui -->
-    </main>
+        </main>
 
-    <!-- FINESTRA DETTAGLI (MODAL) -->
     <div id="wine-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 items-center justify-center p-4" onclick="closeModal()">
         <div class="bg-stone-950 text-white p-6 md:p-8 rounded-3xl max-w-lg w-full border border-stone-800 shadow-2xl relative" onclick="event.stopPropagation()">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-white text-2xl font-sans">&times;</button>
@@ -96,13 +86,12 @@
     </div>
 
     <script>
-        const SPREADSHEET_ID = "17O5LVhc-iiQSwvMl7iWxgENIxnfaUJx1sJrTTyzRYTE";
-        const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:csv`;
-        
+        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/17O5LVhc-iiQSwvMl7iWxgENIxnfaUJx1sJrTTyzRYTE/edit?hl=it&gid=0#gid=0";
         let wines = [];
         let currentFilter = 'Tutti';
         let currentZoneFilter = '';
-        let currentPriceFilter = 'Tutti';
+        let currentPriceFilter = 'Tutti'; 
+        let isLoaded = false;
 
         function shuffleWines(array) {
             let currentIndex = array.length, randomIndex;
@@ -114,61 +103,26 @@
             return array;
         }
 
-        // Funzione per interpretare correttamente le righe di un file CSV complesso
-        function parseCSV(text) {
-            let lines = [];
-            let row = [""];
-            let inQuotes = false;
-
-            for (let i = 0; i < text.length; i++) {
-                let c = text[i];
-                let next = text[i+1];
-                if (c === '"') {
-                    if (inQuotes && next === '"') { row[row.length - 1] += '"'; i++; }
-                    else { inQuotes = !inQuotes; }
-                } else if (c === ',' && !inQuotes) {
-                    row.push('');
-                } else if ((c === '\r' || c === '\n') && !inQuotes) {
-                    if (c === '\r' && next === '\n') { i++; }
-                    lines.push(row);
-                    row = [''];
-                } else {
-                    row[row.length - 1] += c;
-                }
-            }
-            if (row.length > 1 || row[0] !== '') lines.push(row);
-            return lines;
-        }
-
-        async function loadData() {
+        // Callback globale chiamata da Google Fogli
+        window.googleDocCallback = function(data) {
+            isLoaded = true;
             const statusEl = document.getElementById('status-loading');
             try {
-                // Fetch nativo con bypass della cache per dati in tempo reale ed evitare blocchi mobile
-                const response = await fetch(CSV_URL, { cache: "no-store" });
-                if (!response.ok) throw new Error("Errore di rete");
-                
-                const dataText = await response.text();
-                const parsedRows = parseCSV(dataText);
-                
-                if (parsedRows.length < 2) {
-                    statusEl.innerText = "🔴 Il foglio Google sembra vuoto.";
+                if (!data || !data.table || !data.table.rows) {
+                    statusEl.innerText = "🔴 Il foglio Google risponde ma sembra vuoto.";
+                    return;
+                }
+                const rows = data.table.rows;
+                const cols = data.table.cols.map(c => c.label ? c.label.toLowerCase().trim() : '');
+                if (!cols.includes('nome')) {
+                    statusEl.innerHTML = "⚠️ <b>Errore Intestazioni:</b> Manca la colonna 'nome' nel foglio.";
                     return;
                 }
 
-                const cols = parsedRows[0].map(c => c.toLowerCase().trim());
-                const nomeIndex = cols.indexOf('nome');
-                
-                if (nomeIndex === -1) {
-                    statusEl.innerHTML = "⚠️ <b>Errore Intestazioni:</b> Manca la colonna 'nome'.";
-                    return;
-                }
-
-                const rawDataRows = parsedRows.slice(1);
-                const validRows = rawDataRows.filter(row => row[nomeIndex] && row[nomeIndex].trim() !== '');
-
+                const validRows = rows.filter(row => row && row.c && row.c[cols.indexOf('nome')] && row.c[cols.indexOf('nome')].v);
                 wines = shuffleWines(validRows.map(row => {
                     const obj = {};
-                    cols.forEach((colName, i) => { if (colName) obj[colName] = row[i] || ''; });
+                    row.c.forEach((cell, i) => { if (cols[i]) obj[cols[i]] = cell ? cell.v : ''; });
                     
                     const checkBool = (val) => val !== undefined && val !== null && String(val).toUpperCase().trim() === 'TRUE';
 
@@ -178,7 +132,7 @@
                         regione: obj.regione ? String(obj.regione).trim() : '',
                         zona: obj.zona ? String(obj.zona).trim() : '',
                         anno: obj.anno ? parseInt(obj.anno) : '',
-                        prezzo: obj.prezzo ? parseFloat(String(obj.prezzo).replace(',', '.')) : 0,
+                        prezzo: obj.prezzo ? parseFloat(obj.prezzo) : 0,
                         disponibile: obj.disponibile !== undefined ? checkBool(obj.disponibile) : true,
                         doc: obj.doc ? String(obj.doc).trim() : '',
                         descrizione: obj.descrizione ? String(obj.descrizione).trim() : '',
@@ -198,13 +152,30 @@
                 renderWines();
             } catch (error) {
                 console.error(error);
-                statusEl.innerHTML = "🔴 Errore caricamento. <button onclick='loadData()' class='underline font-bold ml-1'>Riprova</button>";
+                statusEl.innerText = "🔴 Errore durante l'elaborazione del menu.";
             }
+        };
+
+        function loadDataViaJSONP() {
+            const statusEl = document.getElementById('status-loading');
+            const matches = GOOGLE_SHEET_URL.match(/\/d\/([^/]+)/);
+            if (!matches || !matches[1]) { statusEl.innerText = "🔴 Errore: Link del foglio non valido."; return; }
+            
+            const script = document.createElement('script');
+            // Sistema anti-cache temporale (&t=...) per costringere i telefoni ad aggiornare i dati reali
+            script.src = `https://docs.google.com/spreadsheets/d/${matches[1]}/gviz/tq?tqx=responseHandler:googleDocCallback&t=${Date.now()}`;
+            script.onerror = function() { statusEl.innerText = "🔴 Impossibile connettersi a Google Fogli."; };
+            document.body.appendChild(script);
+            
+            setTimeout(() => { 
+                if (!isLoaded) statusEl.innerHTML = "⏳ Tempo scaduto. <button onclick='location.reload()' class='underline font-bold text-stone-950 ml-1'>Ricarica</button>"; 
+            }, 6000);
         }
 
         function populateZoneMenus() {
             const rossiSelect = document.getElementById('select-rossi');
             const bianchiSelect = document.getElementById('select-bianchi');
+
             const zoneRossi = new Set();
             const zoneBianchi = new Set();
 
@@ -221,6 +192,7 @@
             Array.from(zoneRossi).sort().forEach(zona => {
                 rossiSelect.innerHTML += `<option value="${zona}">${zona}</option>`;
             });
+
             Array.from(zoneBianchi).sort().forEach(zona => {
                 bianchiSelect.innerHTML += `<option value="${zona}">${zona}</option>`;
             });
@@ -305,9 +277,11 @@
             const badgesHtml = labels.map(l => `<span class="text-[9px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider bg-stone-900 text-stone-300 border border-stone-800">${l}</span>`).join('') + docBadge;
             
             document.getElementById('modal-badge-container').innerHTML = badgesHtml;
+            
             document.getElementById('modal-wine-cantina').innerText = w.cantina;
             document.getElementById('modal-wine-name').innerHTML = `${w.nome} <span class="text-sm font-sans text-stone-500 ml-1 font-normal">${w.anno || ''}</span>`;
             document.getElementById('modal-wine-uve').innerHTML = `🍇 Uve: <span class="text-stone-200 font-sans font-normal">${w.uve || 'N/D'}</span>`;
+            
             document.getElementById('modal-wine-geo').innerHTML = `📍 Denominazione: <b>${w.zona || 'N/D'}</b> &bull; Regione: <b>${w.regione || 'N/D'}</b>`;
             document.getElementById('modal-wine-price').innerText = `${w.prezzo ? w.prezzo.toFixed(2) : '0.00'} €`;
             
@@ -318,6 +292,7 @@
             } else {
                 descBox.classList.add('hidden');
             }
+            
             document.getElementById('wine-modal').classList.replace('hidden', 'flex');
         }
 
@@ -360,6 +335,7 @@
             filtered.forEach(w => {
                 let badgeLabel = w.tipo || 'Vino';
                 let badgeColor = 'bg-stone-900 text-stone-200';
+                
                 const tipoCheck = w.tipo ? w.tipo.toLowerCase().trim() : '';
 
                 if (w.champagne) { badgeLabel = 'Champagne'; badgeColor = 'bg-yellow-900/60 text-yellow-950 font-bold border border-yellow-900/20'; }
@@ -384,13 +360,21 @@
                                 <span class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${badgeColor}">${badgeLabel}</span>
                                 <span class="text-stone-950 font-bold font-sans">${w.prezzo ? w.prezzo.toFixed(2) : '0.00'} €</span>
                             </div>
-                            <h3 class="serif-ananke text-2xl text-stone-950 mt-3 font-medium leading-tight">${w.cantina}</h3>
+                            
+                            <h3 class="serif-ananke text-2xl text-stone-950 mt-3 font-medium leading-tight">
+                                ${w.cantina}
+                            </h3>
+                            
                             <p class="text-stone-900/80 text-base mt-0.5 font-semibold flex items-center flex-wrap">
-                                ${w.nome} <span class="text-xs font-sans text-stone-900/60 ml-2 font-normal">${w.anno || ''}</span>${docBadge}
+                                ${w.nome} 
+                                <span class="text-xs font-sans text-stone-900/60 ml-2 font-normal">${w.anno || ''}</span>
+                                ${docBadge}
                             </p>
+                            
                             <p class="text-stone-900/70 text-xs mt-1.5 font-medium flex items-center gap-1">
                                 🍇 Uve: <span class="font-normal text-stone-900/90">${w.uve || 'N/D'}</span>
                             </p>
+                            
                             <p class="text-stone-900/60 text-xs mt-2 flex items-center gap-1 font-medium">📍 ${geoString}</p>
                         </div>
                     </div>
@@ -398,8 +382,7 @@
             });
         }
 
-        // Avvio del caricamento con il nuovo sistema a prova di smartphone
-        loadData();
+        loadDataViaJSONP();
     </script>
 </body>
 </html>
