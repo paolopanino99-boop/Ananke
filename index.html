@@ -27,10 +27,10 @@
         
         <!-- Brand Link a Instagram con icona -->
         <div class="flex justify-center items-center mt-3">
-            <a href="https://www.instagram.com/viticolturaerotica" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 mt-4 active:scale-95 transition-transform">
-    <span>powered by viticolturaerotica</span>
-    <img src="https://i.ibb.co/XrYGdthZ/icona.png" alt="Viticoltura Erotica" class="w-6 h-6 object-contain" />
-</a>
+            <a href="https://www.instagram.com/viticolturaerotica/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-stone-900/80 hover:text-stone-950 font-medium tracking-wide transition active:scale-95">
+                <span>powered by viticolturaerotica</span>
+                <img src="https://i.ibb.co/XrYGdthZ/icona.png" alt="Viticoltura Erotica" class="w-5 h-5 object-contain rounded-full shadow-xs">
+            </a>
         </div>
         
         <!-- Elemento invisibile di servizio per eventuali errori di caricamento -->
@@ -131,25 +131,18 @@
                     const checkBool = (val) => val !== undefined && val !== null && String(val).toUpperCase().trim() === 'TRUE';
 
                     return {
-                        nome: obj.nome ? String(obj.nome).trim() : '',
                         cantina: obj.cantina ? String(obj.cantina).trim() : '',
+                        nome: obj.nome ? String(obj.nome).trim() : '',
+                        tipo: obj.tipo ? String(obj.tipo).toLowerCase().trim() : '',
                         regione: obj.regione ? String(obj.regione).trim() : '',
                         zona: obj.zona ? String(obj.zona).trim() : '',
+                        uve: obj.uve ? String(obj.uve).trim() : '',
                         anno: obj.anno ? parseInt(obj.anno) : '',
                         prezzo: obj.prezzo ? parseFloat(obj.prezzo) : 0,
                         disponibile: obj.disponibile !== undefined ? checkBool(obj.disponibile) : true,
                         doc: obj.doc ? String(obj.doc).trim() : '',
                         descrizione: obj.descrizione ? String(obj.descrizione).trim() : '',
-                        tipo: obj.tipo ? String(obj.tipo).toLowerCase().trim() : '',
-                        sottotipo: obj.sottotipo ? String(obj.sottotipo).toLowerCase().trim() : '',
-                        uve: obj.uve ? String(obj.uve).trim() : '',
-
-                        'rossi snelli': checkBool(obj['rossi snelli']),
-                        'rossi muscolosi': checkBool(obj['rossi muscolosi']),
-                        'bianchi salini': checkBool(obj['bianchi salini']),
-                        'bianchi profumati': checkBool(obj['bianchi profumati']),
-                    
-                    };
+                        sottotipo: obj.sottotipo ? String(obj.sottotipo).trim() : '',                    };
                 }));
 
                 // Nascondi l'elemento di status se il caricamento va a buon fine
@@ -261,17 +254,8 @@
             if (!w) return;
             const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-stone-800 text-stone-400 px-1.5 py-0.5 rounded border border-stone-700 ml-2 uppercase">${w.doc}</span>` : '';
             let labels = [];
-            if (w['franciacorta']) labels.push('Franciacorta');
-            if (w['champagne']) labels.push('Champagne');
-            if (w['altre bolle']) labels.push('Altre Bolle');
-            if (w['arancione']) labels.push('Arancione');
-            if (w['rosa']) labels.push('Rosa');
-            if (w['bianco']) labels.push('Bianco');
-            if (w['bianco acido']) labels.push('Bianco acido');
-            if (w['bianco profumato']) labels.push('Bianco profumato');
-            if (w['bianco ricco']) labels.push('Bianco ricco');
-            if (w['bianco salino']) labels.push('Bianco salino');
-        
+            if (w.sottotipo) labels.push(w.sottotipo);
+            
             const badgesHtml = labels.map(l => `<span class="text-[9px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider bg-stone-900 text-stone-300 border border-stone-800">${l}</span>`).join('') + docBadge;
             
             document.getElementById('modal-badge-container').innerHTML = badgesHtml;
@@ -326,22 +310,18 @@
             }
 
             filtered.forEach(w => {
-                let badgeLabel = w.tipo || 'Vino';
+                let badgeLabel = w.sottotipo || 'Vino';
                 let badgeColor = 'bg-stone-900 text-stone-200';
                 
-                const tipoCheck = w.tipo ? w.tipo.toLowerCase().trim() : '';
+                const tipoCheck = w.sottotipo ? w.sottotipo.toLowerCase().trim() : '';
 
-                if (w.champagne) { badgeLabel = 'Champagne'; badgeColor = 'bg-yellow-900/60 text-yellow-950 font-bold border border-yellow-900/20'; }
-                else if (w['rossi muscolosi']) { badgeLabel = 'Rosso Muscoloso'; badgeColor = 'bg-red-950 text-red-100'; }
-                else if (w['rossi snelli']) { badgeLabel = 'Rosso Snello'; badgeColor = 'bg-red-900/80 text-red-100'; }
-                else if (w['bianchi profumati']) { badgeLabel = 'Bianco Profumato'; badgeColor = 'bg-amber-950 text-amber-100'; }
-                else if (w['bianchi salini']) { badgeLabel = 'Bianco Salino'; badgeColor = 'bg-yellow-950 text-amber-100'; }
-                else if (tipoCheck === 'rosso') { badgeLabel = 'Rosso'; badgeColor = 'bg-red-950 text-red-200'; }
-                else if (tipoCheck === 'bianco') { badgeLabel = 'Bianco'; badgeColor = 'bg-amber-950 text-amber-100'; }
-                else if (tipoCheck === 'franciacorta') { badgeLabel = 'Franciacorta'; badgeColor = 'bg-yellow-600 text-white font-bold'; }
-                else if (tipoCheck === 'altre bolle') { badgeLabel = 'Altre Bolle'; badgeColor = 'bg-zinc-800 text-yellow-100'; }
-                else if (tipoCheck === 'arancione') { badgeLabel = 'Arancione'; badgeColor = 'bg-orange-800 text-orange-100'; }
-                else if (tipoCheck === 'rosa') { badgeLabel = 'Rosa'; badgeColor = 'bg-pink-800 text-pink-100'; }
+                
+                if (tipoCheck === 'rosso') { badgeColor = 'bg-red-950 text-red-200'; }
+                else if (tipoCheck === 'bianco') { badgeColor = 'bg-amber-950 text-amber-100'; }
+                else if (tipoCheck === 'franciacorta') { badgeColor = 'bg-yellow-600 text-white font-bold'; }
+                else if (tipoCheck === 'altre bolle') { badgeColor = 'bg-zinc-800 text-yellow-100'; }
+                else if (tipoCheck === 'arancione') { badgeColor = 'bg-orange-800 text-orange-100'; }
+                else if (tipoCheck === 'rosa') { badgeColor = 'bg-pink-800 text-pink-100'; }
 
                 const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-black/10 text-stone-900 px-1.5 py-0.5 rounded border border-black/10 ml-2 uppercase">${w.doc}</span>` : '';
                 const geoString = w.zona ? `${w.zona} &bull; ${w.regione}` : w.regione;
