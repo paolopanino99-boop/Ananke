@@ -256,11 +256,7 @@
             const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-stone-800 text-stone-400 px-1.5 py-0.5 rounded border border-stone-700 ml-2 uppercase">${w.doc}</span>` : '';
             let labels = [];
             if (w.tipo) labels.push(w.tipo);
-            if (w['rossi snelli']) labels.push('Rossi snelli');
-            if (w['rossi muscolosi']) labels.push('Rossi muscolosi');
-            if (w['bianchi salini']) labels.push('Bianchi salini');
-            if (w['bianchi profumati']) labels.push('Bianchi profumati');
-            if (w.champagne) labels.push('Champagne');
+            if (w.sottotipo) labels.push(w.sottotipo);
             const badgesHtml = labels.map(l => `<span class="text-[9px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider bg-stone-900 text-stone-300 border border-stone-800">${l}</span>`).join('') + docBadge;
             
             document.getElementById('modal-badge-container').innerHTML = badgesHtml;
