@@ -142,12 +142,7 @@
                         descrizione: obj.descrizione ? String(obj.descrizione).trim() : '',
                         tipo: obj.tipo ? String(obj.tipo).toLowerCase().trim() : '',
                         uve: obj.uve ? String(obj.uve).trim() : '',
-
-                        'rossi snelli': checkBool(obj['rossi snelli']),
-                        'rossi muscolosi': checkBool(obj['rossi muscolosi']),
-                        'bianchi salini': checkBool(obj['bianchi salini']),
-                        'bianchi profumati': checkBool(obj['bianchi profumati']),
-                        champagne: checkBool(obj.champagne)
+                        sottotipo: obj.sottotipo ? String(obj.sottotipo).trim() : '',
                     };
                 }));
 
