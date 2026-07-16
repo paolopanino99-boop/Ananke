@@ -141,13 +141,14 @@
                         doc: obj.doc ? String(obj.doc).trim() : '',
                         descrizione: obj.descrizione ? String(obj.descrizione).trim() : '',
                         tipo: obj.tipo ? String(obj.tipo).toLowerCase().trim() : '',
+                        sottotipo: obj.sottotipo ? String(obj.sottotipo).toLowerCase().trim() : '',
                         uve: obj.uve ? String(obj.uve).trim() : '',
 
                         'rossi snelli': checkBool(obj['rossi snelli']),
                         'rossi muscolosi': checkBool(obj['rossi muscolosi']),
                         'bianchi salini': checkBool(obj['bianchi salini']),
                         'bianchi profumati': checkBool(obj['bianchi profumati']),
-                        champagne: checkBool(obj.champagne)
+                    
                     };
                 }));
 
@@ -260,12 +261,17 @@
             if (!w) return;
             const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-stone-800 text-stone-400 px-1.5 py-0.5 rounded border border-stone-700 ml-2 uppercase">${w.doc}</span>` : '';
             let labels = [];
-            if (w.tipo) labels.push(w.tipo);
-            if (w['rossi snelli']) labels.push('Rossi snelli');
-            if (w['rossi muscolosi']) labels.push('Rossi muscolosi');
-            if (w['bianchi salini']) labels.push('Bianchi salini');
-            if (w['bianchi profumati']) labels.push('Bianchi profumati');
-            if (w.champagne) labels.push('Champagne');
+            if (w['franciacorta']) labels.push('Franciacorta');
+            if (w['champagne']) labels.push('Champagne');
+            if (w['altre bolle']) labels.push('Altre Bolle');
+            if (w['arancione']) labels.push('Arancione');
+            if (w['rosa']) labels.push('Rosa');
+            if (w['bianco']) labels.push('Bianco');
+            if (w['bianco acido']) labels.push('Bianco acido');
+            if (w['bianco profumato']) labels.push('Bianco profumato');
+            if (w['bianco ricco']) labels.push('Bianco ricco');
+            if (w['bianco salino']) labels.push('Bianco salino');
+        
             const badgesHtml = labels.map(l => `<span class="text-[9px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider bg-stone-900 text-stone-300 border border-stone-800">${l}</span>`).join('') + docBadge;
             
             document.getElementById('modal-badge-container').innerHTML = badgesHtml;
