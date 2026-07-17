@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La carta dei vini di Ananke</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght=0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #e44f24; /* Arancione Ananke */
+            color: #111111;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .serif-ananke {
+            font-family: 'Cormorant Garamond', serif;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <header class="text-center my-6 border-b border-black/10 pb-6">
+        <h1 class="serif-ananke text-5xl md:text-6xl text-stone-950 tracking-tight font-medium lowercase">ananke</h1>
+        <h2 class="serif-ananke text-2xl md:text-3xl text-stone-900 tracking-wide mt-1 italic">La carta dei vini</h2>
+        
+        <!-- Brand Link a Instagram con icona -->
+        <div class="flex justify-center items-center mt-3">
+            <a href="https://www.instagram.com/viticolturaerotica/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-stone-900/80 hover:text-stone-950 font-medium tracking-wide transition active:scale-95">
+                <span>powered by viticolturaerotica</span>
+                <img src="https://i.ibb.co/XrYGdthZ/icona.png" alt="Viticoltura Erotica" class="w-5 h-5 object-contain rounded-full shadow-xs">
+            </a>
+        </div>
+        
+        <!-- Elemento invisibile di servizio per eventuali errori di caricamento -->
+        <div id="status-loading" class="text-xs text-stone-900/60 mt-2 font-medium hidden"></div>
+    </header>
+
+    <section class="mb-8 space-y-4">
+        
+        <div class="flex flex-wrap items-center gap-1.5 py-1">
+            <button onclick="filterType('Tutti', this)" class="cat-btn px-3 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm cursor-pointer">Tutti</button>
+            <button onclick="filterType('rosso', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rossi</button>
+            <button onclick="filterType('bianco', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Bianchi</button>
+            <button onclick="filterType('arancione', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Arancione</button>
+            <button onclick="filterType('rosa', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rosa</button>
+            <button onclick="filterType('franciacorta', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Franciacorta</button>
+            <button onclick="filterType('altre bolle', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Altre Bolle</button>
+            <button onclick="filterType('champagne', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Champagne</button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 pt-1 border-t border-black/5">
+            <div class="flex gap-2 flex-1">
+                <button onclick="filterPrice('ECONOMY')" id="btn-economy" class="price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer">
+                    💰 ECONOMY <span class="block text-[9px] font-normal tracking-normal text-stone-950/60">Fino a 35€</span>
+                </button>
+                <button onclick="filterPrice('POWER')" id="btn-power" class="price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer">
+                    ⚡ POWER <span class="block text-[9px] font-normal tracking-normal text-stone-950/60">Sopra i 35€</span>
+                </button>
+            </div>
+            <button onclick="suggestRandomWine()" class="w-full sm:w-auto px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-xs font-black tracking-wider transition active:scale-95 shadow-sm uppercase cursor-pointer">
+                MA CHE NE SO. FAI TU.
+            </button>
+        </div>
+    </section>
+
+    <main id="wine-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    </main>
+
+    <div id="wine-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 items-center justify-center p-4" onclick="closeModal()">
+        <div class="bg-stone-950 text-white p-6 md:p-8 rounded-3xl max-w-lg w-full border border-stone-800 shadow-2xl relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-stone-400 hover:text-white text-2xl font-sans">&times;</button>
+            <div id="modal-badge-container" class="flex flex-wrap gap-1"></div>
+            
+            <h3 id="modal-wine-cantina" class="serif-ananke text-3xl text-amber-500 mt-3 font-medium leading-tight"></h3>
+            <p id="modal-wine-name" class="text-stone-300 text-base mt-1 font-medium"></p>
+            <p id="modal-wine-uve" class="text-stone-400 text-xs mt-1.5 font-medium flex items-center gap-1"></p>
+            
+            <div class="border-t border-stone-800 my-4 pt-4 space-y-2 text-sm text-stone-300">
+                <p id="modal-wine-geo"></p>
+                <p id="modal-wine-price" class="text-amber-500 font-bold text-lg pt-1"></p>
+            </div>
+            <div id="modal-desc-box" class="bg-stone-900/50 p-4 rounded-xl border border-stone-800/80 mt-4 hidden">
+                <h4 class="text-xs uppercase tracking-wider text-amber-600 font-bold mb-2 font-sans">Nota di Degustazione</h4>
+                <p id="modal-wine-desc" class="serif-ananke text-lg text-stone-200 leading-relaxed italic"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/17O5LVhc-iiQSwvMl7iWxgENIxnfaUJx1sJrTTyzRYTE/edit?hl=it&gid=0#gid=0";
+        let wines = [];
+        let currentFilter = 'Tutti';
+        let currentPriceFilter = 'Tutti'; 
+        let isLoaded = false;
+
+        function shuffleWines(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Callback globale chiamata da Google Fogli
+        window.googleDocCallback = function(data) {
+            isLoaded = true;
+            const statusEl = document.getElementById('status-loading');
+            try {
+                if (!data || !data.table || !data.table.rows) {
+                    statusEl.innerText = "🔴 Il foglio Google risponde ma sembra vuoto.";
+                    statusEl.classList.remove('hidden');
+                    return;
+                }
+                const rows = data.table.rows;
+                const cols = data.table.cols.map(c => c.label ? c.label.toLowerCase().trim() : '');
+                if (!cols.includes('nome')) {
+                    statusEl.innerHTML = "⚠️ <b>Errore Intestazioni:</b> Manca la colonna 'nome' nel foglio.";
+                    statusEl.classList.remove('hidden');
+                    return;
+                }
+
+                const validRows = rows.filter(row => row && row.c && row.c[cols.indexOf('nome')] && row.c[cols.indexOf('nome')].v);
+                wines = shuffleWines(validRows.map(row => {
+                    const obj = {};
+                    row.c.forEach((cell, i) => { if (cols[i]) obj[cols[i]] = cell ? cell.v : ''; });
+                    
+                    const checkBool = (val) => val !== undefined && val !== null && String(val).toUpperCase().trim() === 'TRUE';
+
+                    return {
+                        cantina: obj.cantina ? String(obj.cantina).trim() : '',
+                        nome: obj.nome ? String(obj.nome).trim() : '',
+                        tipo: obj.tipo ? String(obj.tipo).toLowerCase().trim() : '',
+                        regione: obj.regione ? String(obj.regione).trim() : '',
+                        zona: obj.zona ? String(obj.zona).trim() : '',
+                        uve: obj.uve ? String(obj.uve).trim() : '',
+                        anno: obj.anno ? parseInt(obj.anno) : '',
+                        prezzo: obj.prezzo ? parseFloat(obj.prezzo) : 0,
+                        disponibile: obj.disponibile !== undefined ? checkBool(obj.disponibile) : true,
+                        doc: obj.doc ? String(obj.doc).trim() : '',
+                        descrizione: obj.descrizione ? String(obj.descrizione).trim() : '',
+                        sottotipo: obj.sottotipo ? String(obj.sottotipo).trim() : '',                    };
+                }));
+
+                // Nascondi l'elemento di status se il caricamento va a buon fine
+                statusEl.classList.add('hidden');
+                renderWines();
+            } catch (error) {
+                console.error(error);
+                statusEl.innerText = "🔴 Errore durante l'elaborazione del menu.";
+                statusEl.classList.remove('hidden');
+            }
+        };
+
+        function loadDataViaJSONP() {
+            const statusEl = document.getElementById('status-loading');
+            const matches = GOOGLE_SHEET_URL.match(/\/d\/([^/]+)/);
+            if (!matches || !matches[1]) { 
+                statusEl.innerText = "🔴 Errore: Link del foglio non valido."; 
+                statusEl.classList.remove('hidden');
+                return; 
+            }
+            
+            const script = document.createElement('script');
+            script.src = `https://docs.google.com/spreadsheets/d/${matches[1]}/gviz/tq?tqx=responseHandler:googleDocCallback&t=${Date.now()}`;
+            script.onerror = function() { 
+                statusEl.innerText = "🔴 Impossibile connettersi a Google Fogli."; 
+                statusEl.classList.remove('hidden');
+            };
+            document.body.appendChild(script);
+            
+            setTimeout(() => { 
+                if (!isLoaded) {
+                    statusEl.innerHTML = "⏳ Tempo scaduto. <button onclick='location.reload()' class='underline font-bold text-stone-950 ml-1'>Ricarica</button>"; 
+                    statusEl.classList.remove('hidden');
+                }
+            }, 6000);
+        }
+
+        function filterType(type, element) {
+            currentFilter = type;
+            updateButtonStyles(type, element);
+            renderWines();
+        }
+
+        function updateButtonStyles(activeType, element) {
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = "cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer";
+            });
+
+            if (element) {
+                element.className = "cat-btn px-3 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm focus:outline-none cursor-pointer";
+            }
+        }
+
+        function filterPrice(mode) {
+            const btnEconomy = document.getElementById('btn-economy');
+            const btnPower = document.getElementById('btn-power');
+
+            if (currentPriceFilter === mode) {
+                currentPriceFilter = 'Tutti';
+                btnEconomy.className = btnPower.className = "price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer";
+            } else {
+                currentPriceFilter = mode;
+                btnEconomy.className = btnPower.className = "price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer";
+                const activeBtn = mode === 'ECONOMY' ? btnEconomy : btnPower;
+                activeBtn.className = "price-btn flex-1 py-2.5 bg-stone-950 text-white border-stone-950 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-md cursor-pointer";
+            }
+            renderWines();
+        }
+
+        function suggestRandomWine() {
+            if (wines.length === 0) return;
+            
+            const eligibleWines = wines.filter(w => {
+                if (!w.disponibile) return false;
+
+                let matchesFilter = false;
+                const activeFilterLower = currentFilter.toLowerCase().trim();
+                const wineTipoLower = w.tipo ? w.tipo.toLowerCase().trim() : '';
+                
+                if (activeFilterLower === 'tutti') { 
+                    matchesFilter = true; 
+                } else if (activeFilterLower === 'champagne') {
+                    matchesFilter = w.champagne === true || wineTipoLower === 'champagne';
+                } else { 
+                    matchesFilter = wineTipoLower === activeFilterLower; 
+                }
+
+                let matchesPrice = true;
+                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 35;
+                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 35;
+
+                return matchesFilter && matchesPrice;
+            });
+
+            if (eligibleWines.length === 0) {
+                alert("Nessun vino disponibile corrisponde ai filtri attualmente selezionati.");
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * eligibleWines.length);
+            const selectedWine = eligibleWines[randomIndex];
+            
+            const globalIndex = wines.findIndex(w => w.nome === selectedWine.nome && w.cantina === selectedWine.cantina && w.anno === selectedWine.anno);
+            if (globalIndex !== -1) { openModal(globalIndex); }
+        }
+
+        function openModal(index) {
+            const w = wines[index];
+            if (!w) return;
+            const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-stone-800 text-stone-400 px-1.5 py-0.5 rounded border border-stone-700 ml-2 uppercase">${w.doc}</span>` : '';
+            let labels = [];
+            if (w.sottotipo) labels.push(w.sottotipo);
+            
+            const badgesHtml = labels.map(l => `<span class="text-[9px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider bg-stone-900 text-stone-300 border border-stone-800">${l}</span>`).join('') + docBadge;
+            
+            document.getElementById('modal-badge-container').innerHTML = badgesHtml;
+            
+            document.getElementById('modal-wine-cantina').innerText = w.cantina;
+            document.getElementById('modal-wine-name').innerHTML = `${w.nome} <span class="text-sm font-sans text-stone-500 ml-1 font-normal">${w.anno || ''}</span>`;
+            document.getElementById('modal-wine-uve').innerHTML = `🍇 Uve: <span class="text-stone-200 font-sans font-normal">${w.uve || 'N/D'}</span>`;
+            
+            document.getElementById('modal-wine-geo').innerHTML = `📍 Denominazione: <b>${w.zona || 'N/D'}</b> &bull; Regione: <b>${w.regione || 'N/D'}</b>`;
+            document.getElementById('modal-wine-price').innerText = `${w.prezzo ? w.prezzo.toFixed(2) : '0.00'} €`;
+            
+            const descBox = document.getElementById('modal-desc-box');
+            if (w.descrizione && w.descrizione.length > 0) {
+                document.getElementById('modal-wine-desc').innerText = w.descrizione;
+                descBox.classList.remove('hidden');
+            } else {
+                descBox.classList.add('hidden');
+            }
+            
+            document.getElementById('wine-modal').classList.replace('hidden', 'flex');
+        }
+
+        function closeModal() { document.getElementById('wine-modal').classList.replace('flex', 'hidden'); }
+
+        function renderWines() {
+            const container = document.getElementById('wine-list');
+            container.innerHTML = '';
+
+            const filtered = wines.map((w, index) => ({...w, originalIndex: index})).filter(w => {
+                let matchesFilter = false;
+                const activeFilterLower = currentFilter.toLowerCase().trim();
+                const wineTipoLower = w.tipo ? w.tipo.toLowerCase().trim() : '';
+                
+                if (activeFilterLower === 'tutti') { 
+                    matchesFilter = true; 
+                } else if (activeFilterLower === 'champagne') {
+                    matchesFilter = w.champagne === true || wineTipoLower === 'champagne';
+                } else { 
+                    matchesFilter = wineTipoLower === activeFilterLower; 
+                }
+                
+                let matchesPrice = true;
+                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 35;
+                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 35;
+
+                return matchesFilter && matchesPrice && w.disponibile;
+            });
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center text-stone-900/60 py-12 italic text-sm">Nessun vino rispecchia i filtri selezionati.</p>`;
+                return;
+            }
+
+            filtered.forEach(w => {
+                let badgeLabel = w.sottotipo || 'Vino';
+                let badgeColor = 'bg-stone-900 text-stone-200';
+                
+                const tipoCheck = w.sottotipo ? w.sottotipo.toLowerCase().trim() : '';
+
+                
+                if (tipoCheck === 'rosso') { badgeColor = 'bg-red-950 text-red-200'; }
+                else if (tipoCheck === 'bianco') { badgeColor = 'bg-amber-950 text-amber-100'; }
+                else if (tipoCheck === 'franciacorta') { badgeColor = 'bg-yellow-600 text-white font-bold'; }
+                else if (tipoCheck === 'altre bolle') { badgeColor = 'bg-zinc-800 text-yellow-100'; }
+                else if (tipoCheck === 'arancione') { badgeColor = 'bg-orange-800 text-orange-100'; }
+                else if (tipoCheck === 'rosa') { badgeColor = 'bg-pink-800 text-pink-100'; }
+
+                const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-black/10 text-stone-900 px-1.5 py-0.5 rounded border border-black/10 ml-2 uppercase">${w.doc}</span>` : '';
+                const geoString = w.zona ? `${w.zona} &bull; ${w.regione}` : w.regione;
+
+                container.innerHTML += `
+                    <div onclick="openModal(${w.originalIndex})" class="bg-white/40 p-5 rounded-2xl border border-white/20 flex flex-col justify-between transition duration-200 backdrop-blur-xs cursor-pointer hover:bg-white/50 active:scale-[0.99]">
+                        <div>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${badgeColor}">${badgeLabel}</span>
+                                <span class="text-stone-950 font-bold font-sans">${w.prezzo ? w.prezzo.toFixed(2) : '0.00'} €</span>
+                            </div>
+                            
+                            <h3 class="serif-ananke text-2xl text-stone-950 mt-3 font-medium leading-tight">
+                                ${w.cantina}
+                            </h3>
+                            
+                            <p class="text-stone-900/80 text-base mt-0.5 font-semibold flex items-center flex-wrap">
+                                ${w.nome} 
+                                <span class="text-xs font-sans text-stone-900/60 ml-2 font-normal">${w.anno || ''}</span>
+                                ${docBadge}
+                            </p>
+                            
+                            <p class="text-stone-900/70 text-xs mt-1.5 font-medium flex items-center gap-1">
+                                🍇 Uve: <span class="font-normal text-stone-900/90">${w.uve || 'N/D'}</span>
+                            </p>
+                            
+                            <p class="text-stone-900/60 text-xs mt-2 flex items-center gap-1 font-medium">📍 ${geoString}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        loadDataViaJSONP();
+    </script>
+</body>
+</html>
