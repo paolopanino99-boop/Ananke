@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La carta dei vini di Ananke</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght=0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght=300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -53,10 +53,13 @@
         <div class="flex flex-col sm:flex-row gap-3 pt-1 border-t border-black/5">
             <div class="flex gap-2 flex-1">
                 <button onclick="filterPrice('ECONOMY')" id="btn-economy" class="price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer">
-                    💰 ECONOMY <span class="block text-[9px] font-normal tracking-normal text-stone-950/60">Fino a 35€</span>
+                    💰 ECONOMY <span class="block text-[10px] font-semibold tracking-normal text-stone-950">Fino a 30€</span>
+                </button>
+                <button onclick="filterPrice('BUSINESS')" id="btn-business" class="price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer">
+                    💼 BUSINESS <span class="block text-[10px] font-semibold tracking-normal text-stone-950">31€ - 50€</span>
                 </button>
                 <button onclick="filterPrice('POWER')" id="btn-power" class="price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer">
-                    ⚡ POWER <span class="block text-[9px] font-normal tracking-normal text-stone-950/60">Sopra i 35€</span>
+                    ⚡ POWER <span class="block text-[10px] font-semibold tracking-normal text-stone-950">Sopra 50€</span>
                 </button>
             </div>
             <button onclick="suggestRandomWine()" class="w-full sm:w-auto px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-stone-950 rounded-xl text-xs font-black tracking-wider transition active:scale-95 shadow-sm uppercase cursor-pointer">
@@ -198,15 +201,20 @@
 
         function filterPrice(mode) {
             const btnEconomy = document.getElementById('btn-economy');
+            const btnBusiness = document.getElementById('btn-business');
             const btnPower = document.getElementById('btn-power');
+
+            // Reset di tutti i pulsanti prezzo allo stile di base
+            const defaultClass = "price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer";
+            btnEconomy.className = defaultClass;
+            btnBusiness.className = defaultClass;
+            btnPower.className = defaultClass;
 
             if (currentPriceFilter === mode) {
                 currentPriceFilter = 'Tutti';
-                btnEconomy.className = btnPower.className = "price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer";
             } else {
                 currentPriceFilter = mode;
-                btnEconomy.className = btnPower.className = "price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer";
-                const activeBtn = mode === 'ECONOMY' ? btnEconomy : btnPower;
+                const activeBtn = mode === 'ECONOMY' ? btnEconomy : (mode === 'BUSINESS' ? btnBusiness : btnPower);
                 activeBtn.className = "price-btn flex-1 py-2.5 bg-stone-950 text-white border-stone-950 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-md cursor-pointer";
             }
             renderWines();
@@ -231,8 +239,9 @@
                 }
 
                 let matchesPrice = true;
-                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 35;
-                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 35;
+                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 30;
+                if (currentPriceFilter === 'BUSINESS') matchesPrice = w.prezzo >= 31 && w.prezzo <= 50;
+                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 50;
 
                 return matchesFilter && matchesPrice;
             });
@@ -298,8 +307,9 @@
                 }
                 
                 let matchesPrice = true;
-                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 35;
-                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 35;
+                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 30;
+                if (currentPriceFilter === 'BUSINESS') matchesPrice = w.prezzo >= 31 && w.prezzo <= 50;
+                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 50;
 
                 return matchesFilter && matchesPrice && w.disponibile;
             });
@@ -315,7 +325,6 @@
                 
                 const tipoCheck = w.sottotipo ? w.sottotipo.toLowerCase().trim() : '';
 
-                
                 if (tipoCheck === 'rosso') { badgeColor = 'bg-red-950 text-red-200'; }
                 else if (tipoCheck === 'bianco') { badgeColor = 'bg-amber-950 text-amber-100'; }
                 else if (tipoCheck === 'franciacorta') { badgeColor = 'bg-yellow-600 text-white font-bold'; }
