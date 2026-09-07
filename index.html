@@ -39,17 +39,25 @@
 
     <section class="mb-8 space-y-4">
         
-        <div class="flex flex-wrap items-center gap-1.5 py-1">
-            <button onclick="filterType('Tutti', this)" class="cat-btn px-3 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm cursor-pointer">Tutti</button>
-            <button onclick="filterType('rosso', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rossi</button>
-            <button onclick="filterType('bianco', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Bianchi</button>
-            <button onclick="filterType('arancione', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Arancione</button>
-            <button onclick="filterType('rosa', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rosa</button>
-            <button onclick="filterType('franciacorta', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Franciacorta</button>
-            <button onclick="filterType('altre bolle', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Altre Bolle</button>
-            <button onclick="filterType('champagne', this)" class="cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Champagne</button>
+        <!-- Tasti Tipologia (Griglia ordinata e centrata su smartphone) -->
+        <div class="grid grid-cols-4 sm:flex sm:flex-wrap items-center justify-center gap-1.5 py-1">
+            <button onclick="filterType('Tutti', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm cursor-pointer">Tutti</button>
+            <button onclick="filterType('rosso', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rossi</button>
+            <button onclick="filterType('bianco', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Bianchi</button>
+            <button onclick="filterType('arancione', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Arancione</button>
+            <button onclick="filterType('rosa', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Rosa</button>
+            <button onclick="filterType('franciacorta', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Franciacorta</button>
+            <button onclick="filterType('altre bolle', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Altre Bolle</button>
+            <button onclick="filterType('champagne', this)" class="cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 cursor-pointer">Champagne</button>
         </div>
 
+        <!-- Barra di Ricerca Testuale -->
+        <div class="relative pt-1">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pt-1 pointer-events-none text-stone-950/60 text-sm">🔍</span>
+            <input type="text" id="search-input" oninput="handleSearch()" placeholder="Cerca per vino, cantina, vitigno, zona..." class="w-full pl-10 pr-4 py-2.5 bg-white/40 border border-black/10 rounded-xl text-xs font-semibold text-stone-950 placeholder-stone-950/60 focus:outline-none focus:bg-white/60 transition shadow-xs">
+        </div>
+
+        <!-- Filtri Prezzo e Tasto Random -->
         <div class="flex flex-col sm:flex-row gap-3 pt-1 border-t border-black/5">
             <div class="flex gap-2 flex-1">
                 <button onclick="filterPrice('ECONOMY')" id="btn-economy" class="price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer">
@@ -96,6 +104,7 @@
         let wines = [];
         let currentFilter = 'Tutti';
         let currentPriceFilter = 'Tutti'; 
+        let searchQuery = '';
         let isLoaded = false;
 
         function shuffleWines(array) {
@@ -148,7 +157,6 @@
                         sottotipo: obj.sottotipo ? String(obj.sottotipo).trim() : '',                    };
                 }));
 
-                // Nascondi l'elemento di status se il caricamento va a buon fine
                 statusEl.classList.add('hidden');
                 renderWines();
             } catch (error) {
@@ -191,11 +199,11 @@
 
         function updateButtonStyles(activeType, element) {
             document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = "cat-btn px-3 py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer";
+                btn.className = "cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-[#f16943] text-stone-950 hover:bg-white/20 rounded-full text-[11px] font-bold uppercase tracking-wider transition border border-black/5 focus:outline-none cursor-pointer";
             });
 
             if (element) {
-                element.className = "cat-btn px-3 py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm focus:outline-none cursor-pointer";
+                element.className = "cat-btn col-span-2 sm:col-span-auto px-3 py-2 sm:py-1.5 bg-stone-950 text-white rounded-full text-[11px] font-bold uppercase tracking-wider shadow-sm focus:outline-none cursor-pointer";
             }
         }
 
@@ -204,7 +212,6 @@
             const btnBusiness = document.getElementById('btn-business');
             const btnPower = document.getElementById('btn-power');
 
-            // Reset di tutti i pulsanti prezzo allo stile di base
             const defaultClass = "price-btn flex-1 py-2.5 bg-[#f16943] text-stone-950 border border-black/10 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-xs cursor-pointer";
             btnEconomy.className = defaultClass;
             btnBusiness.className = defaultClass;
@@ -217,6 +224,12 @@
                 const activeBtn = mode === 'ECONOMY' ? btnEconomy : (mode === 'BUSINESS' ? btnBusiness : btnPower);
                 activeBtn.className = "price-btn flex-1 py-2.5 bg-stone-950 text-white border-stone-950 rounded-xl text-xs font-bold tracking-widest transition active:scale-95 shadow-md cursor-pointer";
             }
+            renderWines();
+        }
+
+        function handleSearch() {
+            const input = document.getElementById('search-input');
+            searchQuery = input.value.toLowerCase().trim();
             renderWines();
         }
 
@@ -243,11 +256,17 @@
                 if (currentPriceFilter === 'BUSINESS') matchesPrice = w.prezzo >= 31 && w.prezzo <= 50;
                 if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 50;
 
-                return matchesFilter && matchesPrice;
+                let matchesSearch = true;
+                if (searchQuery) {
+                    const fullText = `${w.cantina} ${w.nome} ${w.uve} ${w.regione} ${w.zona} ${w.doc} ${w.anno}`.toLowerCase();
+                    matchesSearch = fullText.includes(searchQuery);
+                }
+
+                return matchesFilter && matchesPrice && matchesSearch;
             });
 
             if (eligibleWines.length === 0) {
-                alert("Nessun vino disponibile corrisponde ai filtri attualmente selezionati.");
+                alert("Nessun vino disponibile corrisponde ai filtri e alla ricerca attualmente selezionati.");
                 return;
             }
 
@@ -311,7 +330,13 @@
                 if (currentPriceFilter === 'BUSINESS') matchesPrice = w.prezzo >= 31 && w.prezzo <= 50;
                 if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 50;
 
-                return matchesFilter && matchesPrice && w.disponibile;
+                let matchesSearch = true;
+                if (searchQuery) {
+                    const fullText = `${w.cantina} ${w.nome} ${w.uve} ${w.regione} ${w.zona} ${w.doc} ${w.anno}`.toLowerCase();
+                    matchesSearch = fullText.includes(searchQuery);
+                }
+
+                return matchesFilter && matchesPrice && matchesSearch && w.disponibile;
             });
 
             if(filtered.length === 0) {
