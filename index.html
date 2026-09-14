@@ -23,8 +23,20 @@
 
     <header class="text-center my-6 border-b border-black/10 pb-6">
         <h1 class="serif-ananke text-5xl md:text-6xl text-stone-950 tracking-tight font-medium lowercase">ananke</h1>
-        <h2 class="serif-ananke text-2xl md:text-3xl text-stone-900 tracking-wide mt-1 italic">La carta dei vini</h2>
+        <h2 id="main-subtitle" class="serif-ananke text-2xl md:text-3xl text-stone-900 tracking-wide mt-1 italic">La carta dei vini</h2>
         
+        <!-- Interruttore Carta / Mescita -->
+        <div class="flex justify-center mt-4">
+            <div class="inline-flex bg-black/10 p-1 rounded-2xl border border-black/5 shadow-xs">
+                <button onclick="switchView('carta')" id="tab-carta" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer bg-stone-950 text-white shadow-sm">
+                    🍷 Carta dei Vini
+                </button>
+                <button onclick="switchView('mescita')" id="tab-mescita" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer text-stone-950 hover:bg-white/20">
+                    🥂 Oggi in mescita
+                </button>
+            </div>
+        </div>
+
         <!-- Brand Link a Instagram con icona -->
         <div class="flex justify-center items-center mt-3">
             <a href="https://www.instagram.com/viticolturaerotica/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-stone-900/80 hover:text-stone-950 font-medium tracking-wide transition active:scale-95">
@@ -90,7 +102,10 @@
             
             <div class="border-t border-stone-800 my-4 pt-4 space-y-2 text-sm text-stone-300">
                 <p id="modal-wine-geo"></p>
-                <p id="modal-wine-price" class="text-amber-500 font-bold text-lg pt-1"></p>
+                <div class="flex justify-between items-center pt-1">
+                    <span id="modal-price-label" class="text-stone-400 text-xs uppercase tracking-wider font-bold">Prezzo Bottiglia</span>
+                    <p id="modal-wine-price" class="text-amber-500 font-bold text-lg"></p>
+                </div>
             </div>
             <div id="modal-desc-box" class="bg-stone-900/50 p-4 rounded-xl border border-stone-800/80 mt-4 hidden">
                 <h4 class="text-xs uppercase tracking-wider text-amber-600 font-bold mb-2 font-sans">Nota di Degustazione</h4>
@@ -102,6 +117,7 @@
     <script>
         const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/17O5LVhc-iiQSwvMl7iWxgENIxnfaUJx1sJrTTyzRYTE/edit?hl=it&gid=0#gid=0";
         let wines = [];
+        let currentView = 'carta'; // 'carta' o 'mescita'
         let currentFilter = 'Tutti';
         let currentPriceFilter = 'Tutti'; 
         let searchQuery = '';
@@ -115,6 +131,14 @@
                 [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
             }
             return array;
+        }
+
+        function parsePrice(val) {
+            if (val === undefined || val === null || val === '') return 0;
+            if (typeof val === 'number') return val;
+            let str = String(val).replace(',', '.').replace(/[^0-9.-]+/g, "");
+            let num = parseFloat(str);
+            return isNaN(num) ? 0 : num;
         }
 
         // Callback globale chiamata da Google Fogli
@@ -141,6 +165,7 @@
                     row.c.forEach((cell, i) => { if (cols[i]) obj[cols[i]] = cell ? cell.v : ''; });
                     
                     const checkBool = (val) => val !== undefined && val !== null && String(val).toUpperCase().trim() === 'TRUE';
+                    const prezzoBicchiereVal = parsePrice(obj.bicchiere);
 
                     return {
                         cantina: obj.cantina ? String(obj.cantina).trim() : '',
@@ -150,11 +175,13 @@
                         zona: obj.zona ? String(obj.zona).trim() : '',
                         uve: obj.uve ? String(obj.uve).trim() : '',
                         anno: obj.anno ? parseInt(obj.anno) : '',
-                        prezzo: obj.prezzo ? parseFloat(obj.prezzo) : 0,
+                        prezzo: parsePrice(obj.prezzo),
+                        prezzoBicchiere: prezzoBicchiereVal,
                         disponibile: obj.disponibile !== undefined ? checkBool(obj.disponibile) : true,
                         doc: obj.doc ? String(obj.doc).trim() : '',
                         descrizione: obj.descrizione ? String(obj.descrizione).trim() : '',
-                        sottotipo: obj.sottotipo ? String(obj.sottotipo).trim() : '',                    };
+                        sottotipo: obj.sottotipo ? String(obj.sottotipo).trim() : '',
+                    };
                 }));
 
                 statusEl.classList.add('hidden');
@@ -162,7 +189,7 @@
             } catch (error) {
                 console.error(error);
                 statusEl.innerText = "🔴 Errore durante l'elaborazione del menu.";
-                statusEl.classList.remove('hidden');
+                statusEl.classList.add('hidden');
             }
         };
 
@@ -186,9 +213,30 @@
             setTimeout(() => { 
                 if (!isLoaded) {
                     statusEl.innerHTML = "⏳ Tempo scaduto. <button onclick='location.reload()' class='underline font-bold text-stone-950 ml-1'>Ricarica</button>"; 
-                    statusEl.classList.remove('hidden');
+                    statusEl.classList.add('hidden');
                 }
             }, 6000);
+        }
+
+        function switchView(view) {
+            currentView = view;
+            const tabCarta = document.getElementById('tab-carta');
+            const tabMescita = document.getElementById('tab-mescita');
+            const mainSubtitle = document.getElementById('main-subtitle');
+
+            const activeTabClass = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer bg-stone-950 text-white shadow-sm";
+            const inactiveTabClass = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer text-stone-950 hover:bg-white/20";
+
+            if (view === 'carta') {
+                tabCarta.className = activeTabClass;
+                tabMescita.className = inactiveTabClass;
+                mainSubtitle.innerText = "La carta dei vini";
+            } else {
+                tabMescita.className = activeTabClass;
+                tabCarta.className = inactiveTabClass;
+                mainSubtitle.innerText = "Oggi in mescita al calice";
+            }
+            renderWines();
         }
 
         function filterType(type, element) {
@@ -238,6 +286,7 @@
             
             const eligibleWines = wines.filter(w => {
                 if (!w.disponibile) return false;
+                if (currentView === 'mescita' && w.prezzoBicchiere <= 0) return false;
 
                 let matchesFilter = false;
                 const activeFilterLower = currentFilter.toLowerCase().trim();
@@ -251,10 +300,11 @@
                     matchesFilter = wineTipoLower === activeFilterLower; 
                 }
 
+                let targetPrice = currentView === 'mescita' ? w.prezzoBicchiere : w.prezzo;
                 let matchesPrice = true;
-                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 30;
-                if (currentPriceFilter === 'BUSINESS') matchesPrice = w.prezzo >= 31 && w.prezzo <= 50;
-                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 50;
+                if (currentPriceFilter === 'ECONOMY') matchesPrice = targetPrice <= 30;
+                if (currentPriceFilter === 'BUSINESS') matchesPrice = targetPrice >= 31 && targetPrice <= 50;
+                if (currentPriceFilter === 'POWER') matchesPrice = targetPrice > 50;
 
                 let matchesSearch = true;
                 if (searchQuery) {
@@ -283,6 +333,7 @@
             const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-stone-800 text-stone-400 px-1.5 py-0.5 rounded border border-stone-700 ml-2 uppercase">${w.doc}</span>` : '';
             let labels = [];
             if (w.sottotipo) labels.push(w.sottotipo);
+            if (currentView === 'mescita' || w.prezzoBicchiere > 0) labels.push('In Mescita');
             
             const badgesHtml = labels.map(l => `<span class="text-[9px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider bg-stone-900 text-stone-300 border border-stone-800">${l}</span>`).join('') + docBadge;
             
@@ -293,7 +344,11 @@
             document.getElementById('modal-wine-uve').innerHTML = `🍇 Uve: <span class="text-stone-200 font-sans font-normal">${w.uve || 'N/D'}</span>`;
             
             document.getElementById('modal-wine-geo').innerHTML = `📍 Denominazione: <b>${w.zona || 'N/D'}</b> &bull; Regione: <b>${w.regione || 'N/D'}</b>`;
-            document.getElementById('modal-wine-price').innerText = `${w.prezzo ? w.prezzo.toFixed(2) : '0.00'} €`;
+            
+            const isMescitaView = currentView === 'mescita';
+            document.getElementById('modal-price-label').innerText = isMescitaView ? 'Prezzo Calice' : 'Prezzo Bottiglia';
+            const activePrice = isMescitaView ? w.prezzoBicchiere : w.prezzo;
+            document.getElementById('modal-wine-price').innerText = `${activePrice ? activePrice.toFixed(2) : '0.00'} €`;
             
             const descBox = document.getElementById('modal-desc-box');
             if (w.descrizione && w.descrizione.length > 0) {
@@ -312,7 +367,11 @@
             const container = document.getElementById('wine-list');
             container.innerHTML = '';
 
-            const filtered = wines.map((w, index) => ({...w, originalIndex: index})).filter(w => {
+            let filtered = wines.map((w, index) => ({...w, originalIndex: index})).filter(w => {
+                if (!w.disponibile) return false;
+                // Se siamo in vista mescita, escludi i vini che hanno il bicchiere vuoto (0 o non valido)
+                if (currentView === 'mescita' && w.prezzoBicchiere <= 0) return false;
+
                 let matchesFilter = false;
                 const activeFilterLower = currentFilter.toLowerCase().trim();
                 const wineTipoLower = w.tipo ? w.tipo.toLowerCase().trim() : '';
@@ -325,10 +384,11 @@
                     matchesFilter = wineTipoLower === activeFilterLower; 
                 }
                 
+                let targetPrice = currentView === 'mescita' ? w.prezzoBicchiere : w.prezzo;
                 let matchesPrice = true;
-                if (currentPriceFilter === 'ECONOMY') matchesPrice = w.prezzo <= 30;
-                if (currentPriceFilter === 'BUSINESS') matchesPrice = w.prezzo >= 31 && w.prezzo <= 50;
-                if (currentPriceFilter === 'POWER') matchesPrice = w.prezzo > 50;
+                if (currentPriceFilter === 'ECONOMY') matchesPrice = targetPrice <= 30;
+                if (currentPriceFilter === 'BUSINESS') matchesPrice = targetPrice >= 31 && targetPrice <= 50;
+                if (currentPriceFilter === 'POWER') matchesPrice = targetPrice > 50;
 
                 let matchesSearch = true;
                 if (searchQuery) {
@@ -336,11 +396,35 @@
                     matchesSearch = fullText.includes(searchQuery);
                 }
 
-                return matchesFilter && matchesPrice && matchesSearch && w.disponibile;
+                return matchesFilter && matchesPrice && matchesSearch;
             });
 
+            // Ordinamento personalizzato per la visualizzazione "mescita"
+            if (currentView === 'mescita') {
+                const orderMap = {
+                    'franciacorta': 1,
+                    'altre bolle': 2,
+                    'champagne': 3,
+                    'bianco': 4,
+                    'rosso': 5,
+                    'rosa': 6,
+                    'arancione': 7
+                };
+
+                filtered.sort((a, b) => {
+                    const typeA = a.tipo ? a.tipo.toLowerCase().trim() : '';
+                    const typeB = b.tipo ? b.tipo.toLowerCase().trim() : '';
+                    const orderA = orderMap[typeA] || 99;
+                    const orderB = orderMap[typeB] || 99;
+                    return orderA - orderB;
+                });
+            }
+
             if(filtered.length === 0) {
-                container.innerHTML = `<p class="col-span-full text-center text-stone-900/60 py-12 italic text-sm">Nessun vino rispecchia i filtri selezionati.</p>`;
+                const emptyMsg = currentView === 'mescita' 
+                    ? "Nessun vino in mescita rispecchia i filtri selezionati." 
+                    : "Nessun vino rispecchia i filtri selezionati.";
+                container.innerHTML = `<p class="col-span-full text-center text-stone-900/60 py-12 italic text-sm">${emptyMsg}</p>`;
                 return;
             }
 
@@ -359,13 +443,16 @@
 
                 const docBadge = w.doc ? `<span class="text-[10px] font-sans font-bold tracking-wider bg-black/10 text-stone-900 px-1.5 py-0.5 rounded border border-black/10 ml-2 uppercase">${w.doc}</span>` : '';
                 const geoString = w.zona ? `${w.zona} &bull; ${w.regione}` : w.regione;
+                
+                const displayPrice = currentView === 'mescita' ? w.prezzoBicchiere : w.prezzo;
+                const priceLabelSuffix = currentView === 'mescita' ? ' € <span class="text-[11px] font-medium text-stone-700">calice</span>' : ' €';
 
                 container.innerHTML += `
                     <div onclick="openModal(${w.originalIndex})" class="bg-white/40 p-5 rounded-2xl border border-white/20 flex flex-col justify-between transition duration-200 backdrop-blur-xs cursor-pointer hover:bg-white/50 active:scale-[0.99]">
                         <div>
                             <div class="flex justify-between items-start gap-2">
                                 <span class="text-[10px] font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${badgeColor}">${badgeLabel}</span>
-                                <span class="text-stone-950 font-bold font-sans">${w.prezzo ? w.prezzo.toFixed(2) : '0.00'} €</span>
+                                <span class="text-stone-950 font-bold font-sans">${displayPrice ? displayPrice.toFixed(2) : '0.00'}${priceLabelSuffix}</span>
                             </div>
                             
                             <h3 class="serif-ananke text-2xl text-stone-950 mt-3 font-medium leading-tight">
