@@ -21,12 +21,11 @@
 </head>
 <body class="p-4 md:p-8 max-w-4xl mx-auto">
 
-    <header class="text-center my-6 border-b border-black/10 pb-6">
+    <header class="text-center my-4 border-b border-black/10 pb-4">
         <h1 class="serif-ananke text-5xl md:text-6xl text-stone-950 tracking-tight font-medium lowercase">ananke</h1>
-        <h2 id="main-subtitle" class="serif-ananke text-2xl md:text-3xl text-stone-900 tracking-wide mt-1 italic">La carta dei vini</h2>
         
         <!-- Interruttore Carta / Mescita -->
-        <div class="flex justify-center mt-4">
+        <div class="flex justify-center mt-3">
             <div class="inline-flex bg-black/10 p-1 rounded-2xl border border-black/5 shadow-xs">
                 <button onclick="switchView('carta')" id="tab-carta" class="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer bg-stone-950 text-white shadow-sm">
                     🍷 Carta dei Vini
@@ -38,7 +37,7 @@
         </div>
 
         <!-- Brand Link a Instagram con icona -->
-        <div class="flex justify-center items-center mt-3">
+        <div class="flex justify-center items-center mt-2.5">
             <a href="https://www.instagram.com/viticolturaerotica/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-stone-900/80 hover:text-stone-950 font-medium tracking-wide transition active:scale-95">
                 <span>powered by viticolturaerotica</span>
                 <img src="https://i.ibb.co/XrYGdthZ/icona.png" alt="Viticoltura Erotica" class="w-5 h-5 object-contain rounded-full shadow-xs">
@@ -222,7 +221,6 @@
             currentView = view;
             const tabCarta = document.getElementById('tab-carta');
             const tabMescita = document.getElementById('tab-mescita');
-            const mainSubtitle = document.getElementById('main-subtitle');
 
             const activeTabClass = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer bg-stone-950 text-white shadow-sm";
             const inactiveTabClass = "px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition cursor-pointer text-stone-950 hover:bg-white/20";
@@ -230,11 +228,9 @@
             if (view === 'carta') {
                 tabCarta.className = activeTabClass;
                 tabMescita.className = inactiveTabClass;
-                mainSubtitle.innerText = "La carta dei vini";
             } else {
                 tabMescita.className = activeTabClass;
                 tabCarta.className = inactiveTabClass;
-                mainSubtitle.innerText = "Oggi in mescita al calice";
             }
             renderWines();
         }
@@ -369,7 +365,6 @@
 
             let filtered = wines.map((w, index) => ({...w, originalIndex: index})).filter(w => {
                 if (!w.disponibile) return false;
-                // Se siamo in vista mescita, escludi i vini che hanno il bicchiere vuoto (0 o non valido)
                 if (currentView === 'mescita' && w.prezzoBicchiere <= 0) return false;
 
                 let matchesFilter = false;
