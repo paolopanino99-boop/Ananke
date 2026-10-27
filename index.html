@@ -339,7 +339,7 @@
             document.getElementById('modal-wine-name').innerHTML = `${w.nome} <span class="text-sm font-sans text-stone-500 ml-1 font-normal">${w.anno || ''}</span>`;
             document.getElementById('modal-wine-uve').innerHTML = `🍇 Uve: <span class="text-stone-200 font-sans font-normal">${w.uve || 'N/D'}</span>`;
             
-            document.getElementById('modal-wine-geo').innerHTML = `📍 Denominazione: <b>${w.zona || 'N/D'}</b> &bull; Regione: <b>${w.regione || 'N/D'}</b>`;
+            document.getElementById('modal-wine-geo').innerHTML = `📍 Zona: <b>${w.zona || 'N/D'}</b> &bull; Regione: <b>${w.regione || 'N/D'}</b>`;
             
             const isMescitaView = currentView === 'mescita';
             document.getElementById('modal-price-label').innerText = isMescitaView ? 'Prezzo Calice' : 'Prezzo Bottiglia';
